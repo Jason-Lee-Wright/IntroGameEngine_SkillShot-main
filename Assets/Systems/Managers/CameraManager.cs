@@ -12,7 +12,7 @@ public class CameraManager : MonoBehaviour
     InputManager inputManager => GameManager.Instance.InputManager;
 
     [Header("Cinemachine Camera Refereces")]
-    [SerializeField] private CinemachineCamera ballCamera;    
+    [SerializeField] private CinemachineCamera ballCamera;
     [SerializeField] private CinemachineCamera menuCamera;
     [SerializeField] private Transform target;
 
@@ -65,7 +65,7 @@ public class CameraManager : MonoBehaviour
         if (zoomInput.y != 0)
         {
             if (ballCamOrbitalFollow != null)
-            { 
+            {
                 targetZoom = Mathf.Clamp(ballCamOrbitalFollow.Radius - zoomInput.y * zoomSpeed, minDistance, maxDistance);
 
                 zoomInput = Vector2.zero;
@@ -124,13 +124,33 @@ public class CameraManager : MonoBehaviour
         ballCamera.enabled = true;
     }
 
-    public void SetBallCameraOrientation(Vector3 targetOrientation)
+    public void SetBallCameraOrientation(Vector3 targetDirection)
     {
-        // Snap camera to target's position and orientation
-        ballCamera.ForceCameraPosition(target.position, Quaternion.LookRotation(targetOrientation));
+        // Create rotation from direction vector
+        Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
 
+        // Force camera to target's position with the specified rotation
+        ballCamera.ForceCameraPosition(target.position, targetRotation);
 
+        // Also set the orbital follow axes to match this orientation
+        if (ballCamOrbitalFollow != null)
+        {
+            // Convert the rotation to euler angles for the orbital follow
+            Vector3 eulerAngles = targetRotation.eulerAngles;
 
+            // Set horizontal axis (Y rotation)
+            ballCamOrbitalFollow.HorizontalAxis.Value = eulerAngles.y;
+
+            // Set vertical axis (X rotation) - may need adjustment based on your setup
+            ballCamOrbitalFollow.VerticalAxis.Value = eulerAngles.x;
+
+            // Clamp vertical rotation to your limits
+            ballCamOrbitalFollow.VerticalAxis.Value = Mathf.Clamp(
+                ballCamOrbitalFollow.VerticalAxis.Value,
+                minVerticalAngle,
+                maxVerticalAngle
+            );
+        }
     }
 
 
@@ -141,7 +161,7 @@ public class CameraManager : MonoBehaviour
 
 
     private void SetZoomInput(Vector2 input)
-    { 
+    {
         zoomInput = new Vector2(input.x, input.y);
     }
 
