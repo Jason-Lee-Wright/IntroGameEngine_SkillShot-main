@@ -6,18 +6,19 @@ public class TeliportManager : MonoBehaviour
 
     private GameObject Victim;
 
+    private Rigidbody Rb;
+
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "")
-        {
             Victim = other.gameObject;
+            Rb = other.GetComponent<Rigidbody>();
 
             TeliportMe(Victim);
-        }
     }
 
     void TeliportMe(GameObject Subject)
     {
         Subject.transform.position = Location;
+        Rb.linearVelocity = Vector3.zero;
     }
 }
