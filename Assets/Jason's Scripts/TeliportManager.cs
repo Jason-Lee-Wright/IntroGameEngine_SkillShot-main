@@ -20,5 +20,6 @@ public class TeliportManager : MonoBehaviour
     {
         Subject.transform.position = Location;
         Rb.linearVelocity = Vector3.zero;
+        Rb.angularVelocity = Vector3.zero;
     }
 }
